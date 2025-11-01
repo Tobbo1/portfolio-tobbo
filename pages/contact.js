@@ -4,6 +4,12 @@ import { useState } from 'react';
 import Navbar from '../components/ui/Navbar';
 import Footer from '../components/ui/Footer';
 import { Mail, MapPin, Phone, Send, Github, Linkedin } from 'lucide-react';
+import emailjs from 'emailjs-com';
+
+// Initialize EmailJS with your Public Key
+if (typeof window !== 'undefined') {
+  emailjs.init('LUP5SVRQIzAk118pI');
+}
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -13,17 +19,41 @@ export default function Contact() {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulation d'envoi
-    setTimeout(() => {
-      alert('Message envoyé avec succès ! Je vous répondrai rapidement.');
+    setSubmitStatus('sending');
+
+    try {
+      // Send email using EmailJS
+      const result = await emailjs.send(
+        'service_ld7q8hi', // Your Service ID
+        'template_hnz8qbb', // Your Template ID
+        {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message
+        }
+      );
+
+      console.log('Email sent successfully:', result);
+      setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
+      
+      // Reset status after 5 seconds
+      setTimeout(() => setSubmitStatus(''), 5000);
+    } catch (error) {
+      console.error('Email sending failed:', error);
+      setSubmitStatus('error');
+      
+      // Reset status after 5 seconds
+      setTimeout(() => setSubmitStatus(''), 5000);
+    } finally {
       setIsSubmitting(false);
-    }, 2000);
+    }
   };
 
   const handleChange = (e) => {
@@ -49,7 +79,7 @@ export default function Contact() {
     {
       icon: <Phone className="text-green-600 dark:text-green-400" size={24} />,
       title: "Téléphone",
-      content: "((+237)658123397)",
+      content: "(À venir)",
       link: null
     }
   ];
@@ -226,6 +256,19 @@ export default function Contact() {
                       placeholder="Décrivez votre projet ou votre demande..."
                     />
                   </div>
+
+                  {/* Status Messages */}
+                  {submitStatus === 'success' && (
+                    <div className="p-4 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg">
+                      ✅ Message envoyé avec succès ! Je vous répondrai rapidement.
+                    </div>
+                  )}
+                  
+                  {submitStatus === 'error' && (
+                    <div className="p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg">
+                      ❌ Erreur lors de l'envoi. Veuillez réessayer ou me contacter directement par email.
+                    </div>
+                  )}
                   
                   <motion.button
                     type="submit"
