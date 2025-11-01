@@ -79,7 +79,7 @@ export default function Contact() {
     {
       icon: <Phone className="text-green-600 dark:text-green-400" size={24} />,
       title: "Téléphone",
-      content: "(À venir)",
+      content: "(+237658123397)",
       link: null
     }
   ];
@@ -300,3 +300,4 @@ export default function Contact() {
     </>
   );
 }
+
